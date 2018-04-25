@@ -34,19 +34,29 @@ def login():
     if request.method == "POST":
         # change this to actually validate the entire form submission
         # and not just one field
-        if form.username.data:
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
             # Get the username and password values from the form.
-
+            
+            user = UserProfile.query.filter_by(username=username).first()
+            
+            if user.password == password and user is not None:
+                login_user(user)
             # using your model, query database for a user based on the username
             # and password submitted
             # store the result of that query to a `user` variable so it can be
             # passed to the login_user() method.
 
             # get user id, load into session
-            login_user(user)
+            
 
             # remember to flash a message to the user
-            return redirect(url_for("home"))  # they should be redirected to a secure-page route instead
+                flash("Login Successful", "Successful")
+                
+                return redirect(url_for("secure-page"))  # they should be redirected to a secure-page route instead
+            else:
+                flash("Unsuccessful Login", "Unsuccesful")
     return render_template("login.html", form=form)
 
 
