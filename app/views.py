@@ -6,6 +6,7 @@ This file creates your application.
 """
 
 from app import app, db, login_manager
+from werkzeug.security import check_password_hash
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from forms import LoginForm
@@ -41,17 +42,8 @@ def login():
             
             user = UserProfile.query.filter_by(username=username).first()
             
-            if user.password == password and user is not None:
+            if user is not None and user.password == password:
                 login_user(user)
-            # using your model, query database for a user based on the username
-            # and password submitted
-            # store the result of that query to a `user` variable so it can be
-            # passed to the login_user() method.
-
-            # get user id, load into session
-            
-
-            # remember to flash a message to the user
                 flash("Login Successful", "Successful")
                 return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
             else:
@@ -67,6 +59,11 @@ def secure_page():
 @login_manager.user_loader
 def load_user(id):
     return UserProfile.query.get(int(id))
+
+@app.route('/logout')
+def logout():
+    flash('Logout was succesful')
+    return redirect(url_for('home'))
 
 ###
 # The functions below should be applicable to all Flask apps.
